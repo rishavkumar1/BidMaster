@@ -1,0 +1,16 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# An example controller showing a sample home page
+GET     /                           controllers.HomeController.index()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+GET     /searchProduct/:userId/:category      controllers.BidderController.searchProduct(userId : Long, category : String)
+POST    /placeBid/:userId                     controllers.BidderController.placeBid(userId : Long)
+GET     /getBidHistory/:userId                controllers.BidderController.getBidHistory(userId : Long)
+
+POST    /createAuction/:userId                controllers.VendorController.createAuction(userId : Long)
+GET     /getAuctionHistory/:userId            controllers.VendorController.getAuctionHistory(userId : Long)

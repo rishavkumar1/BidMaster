@@ -5,7 +5,6 @@ The registered users can visit the page to check the different products (by cate
 Each product has a base price, and the bidding for that product can be done with a price which is higher or equal to this base price. A bidding for a lesser price should throw an error.
 At the end of the slot duration for a given product, choose the winner and send a communication to them.
 Vendors can provide multiple items in a single auction while creating an auction.
-Vendors can’t create categories of their own.  
 Vendors need to see the history of auction products they have created.
 Bidders need to see the history of their bids.
 

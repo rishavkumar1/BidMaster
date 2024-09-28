@@ -8,4 +8,4 @@ Vendors can provide multiple items in a single auction while creating an auction
 Vendors need to see the history of auction products they have created.
 Bidders need to see the history of their bids.
 
-Design Explanation PPT: https://drive.google.com/file/d/1dUBv2XKimFB1KmPUafSlwnb6aGqZumhe/view?usp=sharing
+Design Explanation: https://drive.google.com/file/d/1dUBv2XKimFB1KmPUafSlwnb6aGqZumhe/view?usp=sharing

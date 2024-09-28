@@ -8,6 +8,7 @@ import models.Auction;
 import models.AuctionProduct;
 import models.Bid;
 import models.Product;
+import play.Logger;
 import pojo.request.NewAuction;
 import pojo.request.NewProduct;
 import pojo.response.AuctionHistory;
@@ -38,6 +39,8 @@ public class AuctionManager {
     @Inject
     BidService bidService;
 
+    private final String className = AuctionManager.class.getSimpleName();
+
     public void createAuction(Long userId, NewAuction newAuction){
         Auction auction = new Auction();
         auction.setName(newAuction.getAuctionName());
@@ -47,6 +50,7 @@ public class AuctionManager {
         for(NewProduct newProduct : newProducts){
             saveProduct(newProduct, auction);
         }
+        Logger.info(className + ": createAuction : auction with name {} is created by user {}", auction.getName(), userId);
     }
 
     private void saveProduct(NewProduct newProduct, Auction auction) {
@@ -63,6 +67,7 @@ public class AuctionManager {
         auctionProduct.setBidEndTime(newProduct.getBidEndTime());
         auctionProduct.setStatus(AuctionStatus.PENDING);
         auctionProduct.save();
+        Logger.info(className + ": saveProduct : auction product is created with id {} and product with id {}", auctionProduct.getId(), product.getId());
     }
 
     public List<FoundProduct> searchProducts(String category){
@@ -76,6 +81,7 @@ public class AuctionManager {
             if(product != null){
                 FoundProduct foundProduct = getFoundProduct(auctionProduct, product);
                 foundProducts.add(foundProduct);
+                Logger.debug(className + " : searchProducts : product with id {} is found for category {}", product.getId(), category);
             }
         }
         return foundProducts;
@@ -91,6 +97,7 @@ public class AuctionManager {
         foundProduct.setBasePrice(auctionProduct.getBasePrice());
         foundProduct.setCurrentHighestBid(auctionProduct.getCurrentHighestBid());
         foundProduct.setAuctionStatus(auctionProduct.getStatus());
+        Logger.debug(className + " : getFoundProduct : created product details for auction product with id {}", auctionProduct.getId());
         return foundProduct;
     }
 
@@ -130,6 +137,7 @@ public class AuctionManager {
             BidHistory history = buildBidHistory(bid);
             bidHistories.add(history);
         }
+        Logger.info(className + " : getBuildHistory : successfully created bid history for user {}", userId);
         return bidHistories;
     }
 
@@ -148,6 +156,7 @@ public class AuctionManager {
         assert product != null;
         history.setProductName(product.getName());
         history.setProductDescription(product.getDescription());
+        Logger.debug(className + " : buildBidHistory : successfully build bid history for bid id {}", bid.getId());
         return history;
     }
 
@@ -158,6 +167,7 @@ public class AuctionManager {
             AuctionHistory history = buildAuctionHistory(auction);
             histories.add(history);
         }
+        Logger.info(className + " : getAuctionHistory : successfully created auction history for user {}", userId);
         return histories;
     }
 
@@ -171,6 +181,7 @@ public class AuctionManager {
             assert product != null;
             FoundProduct foundProduct = getFoundProduct(auctionProduct, product);
             foundProducts.add(foundProduct);
+            Logger.debug(className + " : buildAuctionHistory : successfully build auction history for auction product id {}", auctionProduct.getId());
         }
         history.setProducts(foundProducts);
         return history;

@@ -51,7 +51,6 @@ public class BidderControllerTest extends HelperTest {
 
     @Before
     public void setUp(){
-        MockitoAnnotations.initMocks(this);
         truncateTables();
     }
 

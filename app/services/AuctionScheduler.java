@@ -8,6 +8,7 @@ import enums.BidStatus;
 import models.AuctionProduct;
 import models.BaseIdModel;
 import models.Bid;
+import play.Logger;
 import services.model_services.AuctionProductService;
 import services.model_services.BidService;
 
@@ -30,6 +31,8 @@ public class AuctionScheduler {
 
     ExecutorService notificationExecutorService = Executors.newFixedThreadPool(10);
 
+    private final String className = AuctionScheduler.class.getSimpleName();
+
     @Inject
     public AuctionScheduler(AuctionProductService auctionProductService, BidService bidService, NotificationService notificationService) {
         this.auctionProductService = auctionProductService;
@@ -38,7 +41,7 @@ public class AuctionScheduler {
         scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                scheduleAuctions();
+                    scheduleAuctions();
             }
         }, 0, 1, TimeUnit.MINUTES);
     }
@@ -49,19 +52,20 @@ public class AuctionScheduler {
         closeAuctions(currentDate);
     }
 
-    private void startAuctions(Date currentDate){
+    public void startAuctions(Date currentDate){
         List<AuctionProduct> auctionProducts = auctionProductService.getAuctionsToStart(currentDate);
         for(AuctionProduct auctionProduct : auctionProducts){
             auctionProduct.setStatus(AuctionStatus.RUNNING);
+            Logger.info(className + " : startAuctions : started auction for auction product id {}", auctionProduct.getId());
         }
         Ebean.saveAll(auctionProducts);
     }
 
-    private void closeAuctions(Date currentDate){
+    public void closeAuctions(Date currentDate){
         List<AuctionProduct> auctionProducts = auctionProductService.getAuctionsToClose(currentDate);
         for(AuctionProduct auctionProduct : auctionProducts){
             auctionProduct.setStatus(AuctionStatus.CLOSED);
-
+            Logger.info(className + " : closeAuctions : closed auction for auction product id {}", auctionProduct.getId());
         }
         List<Long> auctionProductIds = auctionProducts.stream().map(BaseIdModel::getId).collect(Collectors.toList());
         List<Bid> bids = bidService.getBids(auctionProductIds);
@@ -70,10 +74,12 @@ public class AuctionScheduler {
             Long bidId = bid.getId();
             if(winningBidIds.contains(bidId)){
                 bid.setStatus(BidStatus.CONFIRMED);
+                Logger.info(className + " : closeAuctions : confirmed bid for bid id {}", bid.getId());
                 CompletableFuture.runAsync(() -> {
                     notificationService.sendNotification(bid);
                 }, notificationExecutorService);
             }else {
+                Logger.info(className + " : closeAuctions : expired bid for bid id {}", bid.getId());
                 bid.setStatus(BidStatus.EXPIRED);
             }
         }

@@ -56,7 +56,6 @@ public class VendorControllerTest extends HelperTest {
 
     @Before
     public void setUp(){
-        MockitoAnnotations.initMocks(this);
         truncateTables();
     }
 

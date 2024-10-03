@@ -24,17 +24,19 @@ public class BidderController extends Controller {
     public Result searchProduct(Long userId, String category){
         List<FoundProduct> foundProducts = auctionManager.searchProducts(category);
         if(foundProducts.isEmpty()){
+            Logger.info(className + " : searchProduct : For userId {}, no product is found for category {}", userId, category);
             return noContent();
         }
         String foundProductsJson = JsonUtil.toJson(foundProducts);
-        Logger.info(className + " : searchProduct : For userId {}, found these products {}", foundProductsJson);
+        Logger.info(className + " : searchProduct : For userId {}, found these products {}", userId, category);
         return ok(foundProductsJson);
     }
 
     public Result placeBid(Long userId){
-        JsonNode bidData = request().body().asJson();
+        JsonNode bidData = null;
         Bid bid = null;
         try {
+            bidData = request().body().asJson();
             bid = Json.fromJson(bidData, Bid.class);
         }catch (Exception e){
             Logger.error(className + " : placeBid: Some error occurred while parsing new bid data for userId {} and bidData {}", userId, bidData, e);
@@ -50,7 +52,7 @@ public class BidderController extends Controller {
                 return badRequest(failureReason);
             }
         }catch (Exception e){
-            Logger.error(className + " : placeBid: Some error occurred while creation auction for userId {} and bidData {}", userId, bidData, e);
+            Logger.error(className + " : placeBid: Some error occurred while creating auction for userId {} and bidData {}", userId, bidData, e);
             return internalServerError("Some error occurred while placing bid");
         }
     }

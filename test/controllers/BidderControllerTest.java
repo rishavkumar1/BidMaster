@@ -71,6 +71,11 @@ public class BidderControllerTest extends HelperTest {
                 .uri("/searchProduct/1/bike");
         Result searchResult = route(app, searchRequest);
         assertEquals(OK, searchResult.status());
+        searchRequest = new Http.RequestBuilder()
+                .method(GET)
+                .uri("/searchProduct/1/clothing");
+        searchResult = route(app, searchRequest);
+        assertEquals(NO_CONTENT, searchResult.status());
     }
 
     @Test
@@ -78,18 +83,28 @@ public class BidderControllerTest extends HelperTest {
         Long auctionProductId = createAuctionAndProducts();
         String auctionProductIdText = String.valueOf(auctionProductId);
         String requestBody = requestTemplate.replace("%AUCTION_PRODUCT_ID%", auctionProductIdText).replace("%PRICE%", "300020.00");
-        Http.RequestBuilder request = new Http.RequestBuilder()
-                .method(POST)
-                .uri("/placeBid/2").bodyJson(Json.parse(requestBody));
+        Http.RequestBuilder request = new Http.RequestBuilder().method(POST).uri("/placeBid/2").bodyJson(Json.parse(requestBody));
         Result result = route(app, request);
         Bid bid = bidService.getFinder().findList().get(0);
         assertNotNull(bid);
         assertEquals(CREATED, result.status());
-        Http.RequestBuilder bidHistoryRequest = new Http.RequestBuilder()
-                .method(GET)
-                .uri("/getBidHistory/2");
+        Http.RequestBuilder bidHistoryRequest = new Http.RequestBuilder().method(GET).uri("/getBidHistory/2");
         Result bidHistoryResult = route(app, bidHistoryRequest);
         assertEquals(OK, bidHistoryResult.status());
+        request = new Http.RequestBuilder().method(POST).uri("/placeBid/2").bodyText("abc");
+        result = route(app, request);
+        assertEquals(BAD_REQUEST, result.status());
+        requestBody = requestTemplate.replace("%AUCTION_PRODUCT_ID%", auctionProductIdText).replace("%PRICE%", "100020.00");
+        request = new Http.RequestBuilder().method(POST).uri("/placeBid/2").bodyJson(Json.parse(requestBody));
+        result = route(app, request);
+        assertEquals(BAD_REQUEST, result.status());
+        requestBody = requestTemplate.replace("%AUCTION_PRODUCT_ID%", auctionProductIdText).replace("%PRICE%", "290020.00");
+        request = new Http.RequestBuilder().method(POST).uri("/placeBid/2").bodyJson(Json.parse(requestBody));
+        result = route(app, request);
+        assertEquals(BAD_REQUEST, result.status());
+        request = new Http.RequestBuilder().method(POST).uri("/placeBid/-1").bodyJson(Json.parse(requestBody));
+        result = route(app, request);
+        assertEquals(BAD_REQUEST, result.status());
     }
 
     private Long createAuctionAndProducts(){

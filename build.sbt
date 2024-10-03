@@ -28,7 +28,9 @@ import de.johoop.jacoco4sbt.JacocoPlugin.jacoco
 // Apply the Jacoco settings to the project
 Seq(jacoco.settings: _*)
 
-javacOptions in jacoco.Config := Seq("--release", "8")
 jacoco.excludes in jacoco.Config := Seq(
   "views.*"
 )
+
+javaOptions in Test += "-Xmx2G" // Adjust based on your system's memory
+parallelExecution in Test := false

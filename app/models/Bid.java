@@ -11,6 +11,7 @@ import java.util.Date;
 public class Bid extends BaseIdModel{
 
     private Long auctionProductId;
+
     private Long bidderId;
 
     private Date bidTimestamp;

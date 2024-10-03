@@ -56,7 +56,6 @@ public class AuctionManagerTest extends HelperTest {
 
     @Before
     public void setUp(){
-        MockitoAnnotations.initMocks(this);
         truncateTables();
     }
 
